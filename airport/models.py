@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.db import models
+from rest_framework.exceptions import ValidationError
 
 
 class City(models.Model):
@@ -98,8 +100,22 @@ class Flight(models.Model):
         null=True
     )
 
+    def __str__(self):
+        return f"{self.route} - {self.airplane}" \
+               f"({self.departure_time}-{self.arrival_time})"
 
-def __str__(self):
-    return f"{self.route} - {self.airplane}" \
-           f"({self.departure_time}-{self.arrival_time})"
+
+class Order(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return str(self.created_at)
+
 
