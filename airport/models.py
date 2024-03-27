@@ -69,3 +69,11 @@ class Route(models.Model):
 
     def __str__(self):
         return f"{self.source} - {self.destination}({self.destination})"
+
+
+class Crew(models.Model):
+    name = models.CharField(max_length=255)
+    position = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.position} - {self.name}"
