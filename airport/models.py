@@ -20,8 +20,8 @@ class AirplaneType(models.Model):
     class Meta:
         ordering = ("name",)
 
-        def __str__(self):
-            return self.name
+    def __str__(self):
+        return self.name
 
 
 class Airport(models.Model):
@@ -134,12 +134,14 @@ class Ticket(models.Model):
     seat = models.IntegerField()
 
     def clean(self):
-        if not (1 <= self.row <= self.flight.airplane.rows and
-                1 <= self.seat <= self.flight.airplane.seats_in_row):
-            raise ValidationError("Selected seat is not within available range.")
+        if self.row is not None and self.seat is not None:
+            if not (1 <= self.row <= self.flight.airplane.rows and
+                    1 <= self.seat <= self.flight.airplane.seats_in_row):
+                raise ValidationError("Selected seat is not within available range.")
 
-        if Ticket.objects.filter(flight=self.flight, row=self.row, seat=self.seat).exclude(pk=self.pk).exists():
-            raise ValidationError("Selected seat is already taken.")
+        if self.row is not None and self.seat is not None:
+            if Ticket.objects.filter(flight=self.flight, row=self.row, seat=self.seat).exclude(pk=self.pk).exists():
+                raise ValidationError("Selected seat is already taken.")
 
     class Meta:
         unique_together = ("seat", "row")
