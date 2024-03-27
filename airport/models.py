@@ -52,3 +52,20 @@ class Airplane(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Route(models.Model):
+    source = models.ForeignKey(
+        Airport,
+        on_delete=models.CASCADE,
+        related_name="routes_source"
+    )
+    destination = models.ForeignKey(
+        Airport,
+        on_delete=models.CASCADE,
+        related_name="routes_destination"
+    )
+    distance = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.source} - {self.destination}({self.destination})"
