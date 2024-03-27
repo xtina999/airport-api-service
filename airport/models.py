@@ -119,3 +119,31 @@ class Order(models.Model):
         return str(self.created_at)
 
 
+class Ticket(models.Model):
+    flight = models.ForeignKey(
+        Flight,
+        on_delete=models.CASCADE,
+        related_name="tickets"
+    )
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name="tickets"
+    )
+    row = models.IntegerField()
+    seat = models.IntegerField()
+
+    def clean(self):
+        if not (1 <= self.row <= self.flight.airplane.rows and
+                1 <= self.seat <= self.flight.airplane.seats_in_row):
+            raise ValidationError("Selected seat is not within available range.")
+
+        if Ticket.objects.filter(flight=self.flight, row=self.row, seat=self.seat).exclude(pk=self.pk).exists():
+            raise ValidationError("Selected seat is already taken.")
+
+    class Meta:
+        unique_together = ("seat", "row")
+        ordering = ("seat",)
+
+    def __str__(self):
+        return f"{self.flight}(row:{self.row}, seat:{self.seat})"
