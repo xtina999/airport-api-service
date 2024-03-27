@@ -20,3 +20,12 @@ class AirplaneType(models.Model):
 
         def __str__(self):
             return self.name
+
+
+class Airport(models.Model):
+    name = models.CharField(max_length=255)
+    closest_big_city = models.ForeignKey(
+        City,
+        on_delete=models.CASCADE,
+        related_name="airports"
+    )
