@@ -120,6 +120,7 @@ class Order(models.Model):
 
 
 class Ticket(models.Model):
+    passenger = models.CharField(max_length=255, default=None)
     flight = models.ForeignKey(
         Flight,
         on_delete=models.CASCADE,

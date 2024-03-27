@@ -138,6 +138,46 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
+    order = serializers.PrimaryKeyRelatedField(queryset=Order.objects.all(), required=False)
+    route = serializers.StringRelatedField(source="flight.route", read_only=True)
+    airplane = serializers.StringRelatedField(source="flight.airplane", read_only=True)
+    departure_time = serializers.StringRelatedField(source="flight.departure_time", read_only=True)
+    arrival_time = serializers.StringRelatedField(source="flight.arrival_time", read_only=True)
+    user = serializers.StringRelatedField(source="order.user", read_only=True)
+
     class Meta:
         model = Ticket
-        fields = "__all__"
+        fields = (
+            "id",
+            "passenger",
+            "row",
+            "seat",
+            "route",
+            "airplane",
+            "departure_time",
+            "arrival_time",
+            "order",
+            "user"
+        )
+
+    def get_user(self, obj):
+        return obj.order.user.name if obj.order else None
+
+    def validate(self, data):
+        row = data.get('row')
+        seat = data.get('seat')
+        flight = data.get('flight')
+
+        if not (1 <= row <= flight.airplane.rows and 1 <= seat <= flight.airplane.seats_in_row):
+            raise serializers.ValidationError("Selected seat is not within the available range.")
+
+        return data
+
+    def validate_seat(self, value):
+        flight = self.context["request"].data.get("flight")
+
+        if flight and Ticket.objects.filter(flight=flight, seat=value).exists():
+            raise serializers.ValidationError("Selected seat is already taken.")
+
+        return value
+
