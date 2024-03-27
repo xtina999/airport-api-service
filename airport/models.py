@@ -77,3 +77,29 @@ class Crew(models.Model):
 
     def __str__(self):
         return f"{self.position} - {self.name}"
+
+
+class Flight(models.Model):
+    route = models.ForeignKey(
+        "Route",
+        on_delete=models.CASCADE
+    )
+    airplane = models.ForeignKey(
+        "Airplane",
+        on_delete=models.CASCADE,
+        related_name="flights"
+    )
+    departure_time = models.DateTimeField()
+    arrival_time = models.DateTimeField()
+
+    crew = models.ManyToManyField(
+        Crew,
+        related_name="crews",
+        null=True
+    )
+
+
+def __str__(self):
+    return f"{self.route} - {self.airplane}" \
+           f"({self.departure_time}-{self.arrival_time})"
+
