@@ -51,6 +51,12 @@ class AirplaneViewSet(viewsets.ModelViewSet):
     queryset = Airplane.objects.all()
     serializer_class = AirplaneSerializer
 
+    def get_queryset(self):
+        queryset = self.queryset
+        if self.action == "list":
+            queryset = queryset.select_related("airplane_type")
+        return queryset
+
     def get_serializer_class(self):
         if self.action == "list":
             return AirplaneListSerializer
