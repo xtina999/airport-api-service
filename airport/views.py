@@ -118,10 +118,15 @@ class TicketViewSet(viewsets.ModelViewSet):
     serializer_class = TicketSerializer
 
     def get_queryset(self):
-        queryset = self.queryset
-        if self.action == "list":
-            queryset = queryset.select_related("flight", "order")
-        return queryset
+        queryset = self.queryset.select_related("flight", "order")
+        return queryset.filter(order__user=self.request.user)
+
+    def perform_create(self, serializer):
+        order = serializer.validated_data["order"]
+        order.user = self.request.user
+        order.save()
+
+        serializer.save(user=self.request.user)
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -132,5 +137,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         queryset = self.queryset
         if self.action == "list":
             queryset = queryset.select_related("user")
-        return queryset
+        return queryset.filter(user=self.request.user)
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
