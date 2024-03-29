@@ -99,6 +99,12 @@ class FlightViewSet(viewsets.ModelViewSet):
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
 
+    def get_queryset(self):
+        queryset = self.queryset
+        if self.action == "list":
+            queryset = queryset.select_related("route", "airplane")
+        return queryset.prefetch_related("crew")
+
     def get_serializer_class(self):
         if self.action == "list":
             return FlightListSerializer
