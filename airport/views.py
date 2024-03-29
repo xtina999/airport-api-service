@@ -69,6 +69,12 @@ class AirportViewSet(viewsets.ModelViewSet):
     queryset = Airport.objects.all()
     serializer_class = AirportSerializer
 
+    def get_queryset(self):
+        queryset = self.queryset
+        if self.action == "list":
+            queryset = queryset.select_related("closest_big_city")
+        return queryset
+
     def get_serializer_class(self):
         if self.action == "list":
             return AirportListSerializer
