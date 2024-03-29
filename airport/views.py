@@ -117,6 +117,12 @@ class TicketViewSet(viewsets.ModelViewSet):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
 
+    def get_queryset(self):
+        queryset = self.queryset
+        if self.action == "list":
+            queryset = queryset.select_related("flight", "order")
+        return queryset
+
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
