@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "airport",
     "debug_toolbar",
-    "user"
+    "user",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -137,12 +138,25 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 5
 }
 
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Airport Api Service",
+    "DESCRIPTION": "Order tickets for airplane trips",
+    "VERSION": '1.0.0',
+    "SERVE_INCLUDE_SCHEMA": {
+        "deepLinking": True,
+        "defaultModelRendering": "model",
+        "defaultModelExpandDepth": 2
+    }
+
+}
+
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),  # default 5 min
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),  # default 1 day
-    "ROTATE_REFRESH_LIFETIME": True,  # will return also new refresh token
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_LIFETIME": True,
 }
