@@ -99,6 +99,18 @@ class RouteViewSet(viewsets.ModelViewSet):
     serializer_class = RouteSerializer
     permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
+    def get_queryset(self):
+        queryset = self.queryset
+        source_id = self.request.query_params.get('source')
+        destination_id = self.request.query_params.get('destination')
+
+        if source_id:
+            queryset = queryset.filter(source_id=source_id)
+        if destination_id:
+            queryset = queryset.filter(destination_id=destination_id)
+
+        return queryset
+
     def get_serializer_class(self):
         if self.action == "list":
             return RouteListSerializer
