@@ -78,7 +78,7 @@ class AirportViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = self.queryset
 
-        closest_big_city = self.request.query_params.get('closest_big_city')
+        closest_big_city = self.request.query_params.get("closest_big_city")
 
         if closest_big_city:
             queryset = queryset.filter(closest_big_city=closest_big_city)
@@ -114,6 +114,12 @@ class FlightViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = self.queryset
+
+        airplane = self.request.query_params.get("airplane")
+
+        if airplane:
+            queryset = queryset.filter(airplane=airplane)
+
         if self.action == "list":
             queryset = queryset.select_related("route", "airplane")
         return queryset.prefetch_related("crew")
