@@ -136,3 +136,29 @@ class AuthenticatedAirplaneApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
+
+class AdminAirportTests(TestCase):
+    def setUp(self) -> None:
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            "test@test.com",
+            "testpass",
+            is_staff=True
+        )
+        self.client.force_authenticate(self.user)
+
+    def test_admin_airport_create(self):
+        city_1 = City.objects.create(name="Kyiv")
+
+        payload = {
+            "name": "Type1",
+            "closest_big_city": city_1.id,
+        }
+
+        res = self.client.post(AIRPORT_URL, payload)
+
+        airport = Airport.objects.get(id=res.data["id"])
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        self.assertEqual(payload["closest_big_city"], airport.closest_big_city.id)
+
