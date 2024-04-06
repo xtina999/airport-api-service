@@ -138,10 +138,11 @@ class FlightListSerializer(AirplaneSerializer):
     airplane = serializers.StringRelatedField(many=False, read_only=True)
     crew = CrewSerializer(many=True, read_only=True)
     taken_seats = serializers.SerializerMethodField()
+    tickets_available = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Flight
-        fields = ("id", "route", "airplane", "departure_time", "arrival_time", "crew", "taken_seats")
+        fields = ("id", "route", "airplane", "departure_time", "arrival_time", "crew", "taken_seats", "tickets_available")
 
     def get_taken_seats(self, obj):
         return [f"row:{ticket.row} seat:{ticket.seat}" for ticket in obj.tickets.all()]
