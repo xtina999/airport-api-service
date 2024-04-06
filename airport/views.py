@@ -118,7 +118,8 @@ class AirportViewSet(viewsets.ModelViewSet):
             OpenApiParameter(
                 "closest_big_city",
                 type={"type": "number"},
-                description="Filter by closest_big_city id (ex. ?closest_big_city=1)"
+                description="Filter by closest_big_city id "
+                            "(ex. ?closest_big_city=1)"
             )
         ]
     )
@@ -184,8 +185,12 @@ class FlightViewSet(viewsets.ModelViewSet):
     def get_queryset(self) -> QuerySet:
         queryset = self.queryset
         airplane = self.request.query_params.get("airplane")
-        route_source_id = self.request.query_params.get("route_source")
-        route_destination_id = self.request.query_params.get("route_destination")
+        route_source_id = self.request.query_params.get(
+            "route_source"
+        )
+        route_destination_id = self.request.query_params.get(
+            "route_destination"
+        )
 
         if airplane:
             queryset = queryset.filter(airplane=airplane)
@@ -194,7 +199,9 @@ class FlightViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(route__source_id=route_source_id)
 
         if route_destination_id:
-            queryset = queryset.filter(route__destination_id=route_destination_id)
+            queryset = queryset.filter(
+                route__destination_id=route_destination_id
+            )
 
         if self.action == "list":
             queryset = (
@@ -203,8 +210,9 @@ class FlightViewSet(viewsets.ModelViewSet):
                 .prefetch_related("crew")
                 .annotate(
                     tickets_available=F("airplane__rows")
-                    * F("airplane__seats_in_row")
-                    - Count("tickets"))
+                    * F("airplane__seats_in_row") -
+                    Count("tickets")
+                )
             )
 
         return queryset.order_by("id")
@@ -225,7 +233,7 @@ class FlightViewSet(viewsets.ModelViewSet):
             )
         ]
     )
-    def list(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs) -> list:
         """Get list of Flight"""
         return super().list(request, *args, **kwargs)
 
@@ -253,7 +261,7 @@ class TicketViewSet(viewsets.ModelViewSet):
 
         serializer.save(user=self.request.user)
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs) -> list:
         """Get list of Ticket"""
         return super().list(request, *args, **kwargs)
 

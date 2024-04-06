@@ -156,7 +156,9 @@ class TicketSerializer(serializers.ModelSerializer):
     def validate_seat(self, value):
         flight = self.context["request"].data.get("flight")
 
-        if flight and Ticket.objects.filter(flight=flight, seat=value).exists():
+        if flight and Ticket.objects.filter(
+                flight=flight, seat=value
+        ).exists():
             raise serializers.ValidationError(
                 "Selected seat is already taken."
             )
@@ -195,7 +197,7 @@ class RouteSerializer(serializers.ModelSerializer):
 
 class RouteListSerializer(serializers.ModelSerializer):
     source = serializers.StringRelatedField(
-        source=f"source.name",
+        source="source.name",
         read_only=True
     )
     destination = serializers.StringRelatedField(
