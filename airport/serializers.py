@@ -68,10 +68,11 @@ class AirplaneListSerializer(serializers.ModelSerializer):
         slug_field="name",
         queryset=AirplaneType.objects.all()
     )
+    image = serializers.ImageField(use_url=True, required=False)
 
     class Meta:
         model = Airplane
-        fields = ("id", "name", "rows", "seats_in_row", "airplane_type")
+        fields = ("id", "name", "rows", "seats_in_row", "airplane_type", "image")
 
 
 class AirplaneDetailSerializer(serializers.ModelSerializer):
