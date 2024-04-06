@@ -1,5 +1,7 @@
-from django.db.models import Count, F
-from rest_framework import viewsets
+from typing import Type
+
+from django.db.models import Count, F, QuerySet
+from rest_framework import viewsets, serializers
 
 from airport.models import (
     AirplaneType,
@@ -57,13 +59,13 @@ class AirplaneViewSet(viewsets.ModelViewSet):
     serializer_class = AirplaneSerializer
     permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         queryset = self.queryset
         if self.action == "list":
             queryset = queryset.select_related("airplane_type")
         return queryset
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> Type[serializers.ModelSerializer]:
         if self.action == "list":
             return AirplaneListSerializer
         if self.action == "retrieve":
@@ -76,7 +78,7 @@ class AirportViewSet(viewsets.ModelViewSet):
     serializer_class = AirportSerializer
     permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         queryset = self.queryset
 
         closest_big_city = self.request.query_params.get("closest_big_city")
@@ -87,7 +89,7 @@ class AirportViewSet(viewsets.ModelViewSet):
             queryset = queryset.select_related("closest_big_city")
         return queryset
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> Type[serializers.ModelSerializer]:
         if self.action == "list":
             return AirportListSerializer
         if self.action == "retrieve":
@@ -100,7 +102,7 @@ class RouteViewSet(viewsets.ModelViewSet):
     serializer_class = RouteSerializer
     permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         queryset = self.queryset
         source_id = self.request.query_params.get("source")
         destination_id = self.request.query_params.get("destination")
@@ -116,7 +118,7 @@ class RouteViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> Type[serializers.ModelSerializer]:
         if self.action == "list":
             return RouteListSerializer
         if self.action == "retrieve":
@@ -129,7 +131,7 @@ class FlightViewSet(viewsets.ModelViewSet):
     serializer_class = FlightSerializer
     permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         queryset = self.queryset
 
         airplane = self.request.query_params.get("airplane")
@@ -143,12 +145,12 @@ class FlightViewSet(viewsets.ModelViewSet):
                 .select_related("route", "airplane")
                 .prefetch_related("crew")
                 .annotate(
-                    tickets_available=
-                    F("airplane__rows") * F("airplane__seats_in_row") - Count("tickets"))
+                    tickets_available=F("airplane__rows")
+                    * F("airplane__seats_in_row") - Count("tickets"))
             )
         return queryset.order_by("id")
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> Type[serializers.ModelSerializer]:
         if self.action == "list":
             return FlightListSerializer
         if self.action == "retrieve":
@@ -161,11 +163,11 @@ class TicketViewSet(viewsets.ModelViewSet):
     serializer_class = TicketSerializer
     permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         queryset = self.queryset.select_related("flight", "order")
         return queryset.filter(order__user=self.request.user)
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         order = serializer.validated_data["order"]
         order.user = self.request.user
         order.save()
@@ -178,11 +180,11 @@ class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
     permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         queryset = self.queryset
         if self.action == "list":
             queryset = queryset.select_related("user")
         return queryset.filter(user=self.request.user)
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         serializer.save(user=self.request.user)
