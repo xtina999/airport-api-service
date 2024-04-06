@@ -1,5 +1,9 @@
+import os
+import uuid
+
 from django.conf import settings
 from django.db import models
+from django.utils.text import slugify
 from rest_framework.exceptions import ValidationError
 
 
@@ -10,7 +14,7 @@ class City(models.Model):
         verbose_name_plural = "cities"
         ordering = ("name",)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -20,7 +24,7 @@ class AirplaneType(models.Model):
     class Meta:
         ordering = ("name",)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -35,8 +39,16 @@ class Airport(models.Model):
     class Meta:
         ordering = ("name",)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name}({self.closest_big_city})"
+
+
+def airplane_image_file_path(instance, filename):
+    _, extension = os.path.splitext(filename)
+
+    filename = f"{slugify(instance.name)}-{uuid.uuid4()}.{extension}"
+
+    return os.path.join("uploads", "airplanes", filename)
 
 
 class Airplane(models.Model):
@@ -48,11 +60,12 @@ class Airplane(models.Model):
         on_delete=models.CASCADE,
         related_name="airplanes"
     )
+    image = models.ImageField(null=True, upload_to=airplane_image_file_path)
 
     class Meta:
         ordering = ("name",)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -69,7 +82,7 @@ class Route(models.Model):
     )
     distance = models.IntegerField()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.source} - {self.destination}({self.destination})"
 
 
@@ -77,7 +90,7 @@ class Crew(models.Model):
     name = models.CharField(max_length=255)
     position = models.CharField(max_length=255)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.position} - {self.name}"
 
 
@@ -100,7 +113,7 @@ class Flight(models.Model):
         null=True
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.route} - {self.airplane}" \
                f"({self.departure_time}-{self.arrival_time})"
 
@@ -115,7 +128,7 @@ class Order(models.Model):
     class Meta:
         ordering = ["-created_at"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.created_at)
 
 
@@ -138,15 +151,21 @@ class Ticket(models.Model):
         if self.row is not None and self.seat is not None:
             if not (1 <= self.row <= self.flight.airplane.rows and
                     1 <= self.seat <= self.flight.airplane.seats_in_row):
-                raise ValidationError("Selected seat is not within available range.")
+                raise ValidationError(
+                    "Selected seat is not within available range."
+                )
 
         if self.row is not None and self.seat is not None:
-            if Ticket.objects.filter(flight=self.flight, row=self.row, seat=self.seat).exclude(pk=self.pk).exists():
+            if Ticket.objects.filter(
+                    flight=self.flight,
+                    row=self.row,
+                    seat=self.seat
+            ).exclude(pk=self.pk).exists():
                 raise ValidationError("Selected seat is already taken.")
 
     class Meta:
         unique_together = ("seat", "row")
         ordering = ("seat",)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.flight}(row:{self.row}, seat:{self.seat})"

@@ -208,7 +208,8 @@ class Migration(migrations.Migration):
                 (
                     "route",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="airport.route"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="airport.route"
                     ),
                 ),
             ],
