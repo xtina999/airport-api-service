@@ -5,11 +5,14 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from airport.models import AirplaneType, Airplane, Airport, City
-from airport.serializers import AirplaneListSerializer, AirportListSerializer, AirplaneTypeSerializer
+from airport.serializers import AirplaneListSerializer, AirportListSerializer, AirplaneTypeSerializer, \
+    AirportDetailSerializer
 
 AIRPLANE_URL = reverse("airport:airplane-list")
 AIRPORT_URL = reverse("airport:airport-list")
 
+def detail_url(airport_id):
+    return reverse("airport:airport-detail", args=(airport_id,))
 
 def sample_city(**params):
     defaults = {
@@ -110,3 +113,15 @@ class AuthenticatedAirplaneApiTests(TestCase):
 
         self.assertIn(serializer_with_city_1.data, res.data["results"])
         self.assertNotIn(serializer_with_city_2.data, res.data["results"])
+
+    def test_retrieve_airport(self):
+        airport = sample_airport()
+
+        url = detail_url(airport.id)
+
+        res = self.client.get(url)
+
+        serializer = AirportDetailSerializer(airport)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, serializer.data)
