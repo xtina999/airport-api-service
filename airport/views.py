@@ -15,7 +15,7 @@ from airport.models import (
     Crew,
     City
 )
-from airport.permissions import IsAdminOrIsAuthenticatedReadOnly
+
 from airport.serializers import (
     CitySerializer,
     AirplaneTypeSerializer,
@@ -40,7 +40,6 @@ from airport.serializers import (
 class CityViewSet(viewsets.ModelViewSet):
     queryset = City.objects.all()
     serializer_class = CitySerializer
-    permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
     def list(self, request, *args, **kwargs):
         """Get list of City"""
@@ -50,7 +49,6 @@ class CityViewSet(viewsets.ModelViewSet):
 class CrewViewSet(viewsets.ModelViewSet):
     queryset = Crew.objects.all()
     serializer_class = CrewSerializer
-    permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
     def list(self, request, *args, **kwargs):
         """Get list of Crew"""
@@ -60,7 +58,6 @@ class CrewViewSet(viewsets.ModelViewSet):
 class AirplaneTypeViewSet(viewsets.ModelViewSet):
     queryset = AirplaneType.objects.all()
     serializer_class = AirplaneTypeSerializer
-    permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
     def list(self, request, *args, **kwargs):
         """Get list of AirplaneType"""
@@ -70,7 +67,6 @@ class AirplaneTypeViewSet(viewsets.ModelViewSet):
 class AirplaneViewSet(viewsets.ModelViewSet):
     queryset = Airplane.objects.all()
     serializer_class = AirplaneSerializer
-    permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
     def get_queryset(self) -> QuerySet:
         queryset = self.queryset
@@ -93,7 +89,6 @@ class AirplaneViewSet(viewsets.ModelViewSet):
 class AirportViewSet(viewsets.ModelViewSet):
     queryset = Airport.objects.all()
     serializer_class = AirportSerializer
-    permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
     def get_queryset(self) -> QuerySet:
         queryset = self.queryset
@@ -131,7 +126,6 @@ class AirportViewSet(viewsets.ModelViewSet):
 class RouteViewSet(viewsets.ModelViewSet):
     queryset = Route.objects.all()
     serializer_class = RouteSerializer
-    permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
     def get_queryset(self) -> QuerySet:
         queryset = self.queryset
@@ -180,7 +174,6 @@ class RouteViewSet(viewsets.ModelViewSet):
 class FlightViewSet(viewsets.ModelViewSet):
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
-    permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
     def get_queryset(self) -> QuerySet:
         queryset = self.queryset
@@ -248,7 +241,6 @@ class FlightViewSet(viewsets.ModelViewSet):
 class TicketViewSet(viewsets.ModelViewSet):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
-    permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
     def get_queryset(self) -> QuerySet:
         queryset = self.queryset.select_related("flight", "order")
@@ -269,7 +261,6 @@ class TicketViewSet(viewsets.ModelViewSet):
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
     def get_queryset(self) -> QuerySet:
         queryset = self.queryset
