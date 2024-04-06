@@ -160,5 +160,8 @@ class AdminAirportTests(TestCase):
         airport = Airport.objects.get(id=res.data["id"])
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
-        self.assertEqual(payload["closest_big_city"], airport.closest_big_city.id)
+        self.assertEqual(
+            payload["closest_big_city"],
+            airport.closest_big_city.id
+        )
 
