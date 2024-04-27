@@ -248,8 +248,15 @@ class TicketViewSet(viewsets.ModelViewSet):
         queryset = self.queryset.select_related("flight", "order")
         return queryset.filter(order__user=self.request.user)
 
-    def perform_create(self, serializer) -> None:
-        serializer.save()
+    def perform_create(self, serializer):
+        # Отримуємо дані з запиту
+        data = serializer.validated_data
+        # Отримуємо користувача, який відправив запит
+        user = self.request.user
+        # Створюємо нове замовлення для цього користувача
+        order = Order.objects.create(user=user)
+        # Призначаємо створене замовлення квитку
+        serializer.save(order=order)
 
     def perform_destroy(self, instance):
         # Видаляємо об'єкт з бази даних

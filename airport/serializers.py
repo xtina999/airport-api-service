@@ -98,10 +98,10 @@ class FlightSerializer(serializers.ModelSerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
-    order = serializers.PrimaryKeyRelatedField(
-        queryset=Order.objects.all(),
-        required=False
-    )
+    # order = serializers.PrimaryKeyRelatedField(
+    #     queryset=Order.objects.all(),
+    #     required=False
+    # )
     route =  serializers.StringRelatedField(
         source="flight.route",
         read_only=True
@@ -118,6 +118,7 @@ class TicketSerializer(serializers.ModelSerializer):
         source="flight.airplane",
         read_only=True
     )
+
     class Meta:
         model = Ticket
         fields = (
@@ -125,19 +126,19 @@ class TicketSerializer(serializers.ModelSerializer):
             "passenger",
             "row",
             "seat",
-            "order",
+            "flight",
             "route",
             "departure_time",
             "arrival_time",
             "airplane"
         )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        request = self.context.get('request')
-        if request:
-            user = request.user
-            self.fields['order'].queryset = Order.objects.filter(user=user)
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     request = self.context.get('request')
+    #     if request:
+    #         user = request.user
+    #         self.fields['order'].queryset = Order.objects.filter(user=user)
 
     def get_user(self, obj):
         return obj.order.user.name if obj.order else None
@@ -156,6 +157,7 @@ class TicketSerializer(serializers.ModelSerializer):
             )
 
         return data
+
 
     def validate_seat(self, value):
         flight = self.context["request"].data.get("flight")
@@ -249,21 +251,23 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
+        request = self.context.get('request')
+        print(f"Current user: {request.user}")  # Виведення поточного користувача для перевірки
         with transaction.atomic():
             tickets_data = validated_data.pop("tickets")
-            order = Order.objects.create(**validated_data)
+            order = Order.objects.create(user=request.user, **validated_data)
             for ticket_data in tickets_data:
                 Ticket.objects.create(order=order, **ticket_data)
             return order
 
 
 class TicketListSerializer(TicketSerializer):
+    order = serializers.PrimaryKeyRelatedField(
+        queryset=Order.objects.all(),
+        required=False
+    )
     route = serializers.StringRelatedField(
         source="flight.route",
-        read_only=True
-    )
-    airplane = serializers.StringRelatedField(
-        source="flight.airplane",
         read_only=True
     )
     departure_time = serializers.StringRelatedField(
@@ -274,19 +278,23 @@ class TicketListSerializer(TicketSerializer):
         source="flight.arrival_time",
         read_only=True
     )
-    order = OrderSerializer(many=False, read_only=True)
+    airplane = serializers.StringRelatedField(
+        source="flight.airplane",
+        read_only=True
+    )
 
     class Meta:
         model = Ticket
         fields = (
             "id",
+            "passenger",
             "row",
             "seat",
+            "order",
             "route",
-            "airplane",
             "departure_time",
             "arrival_time",
-            "order"
+            "airplane"
         )
 
 
