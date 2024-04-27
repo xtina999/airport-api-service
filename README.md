@@ -34,7 +34,20 @@ Install PostgresSQL and create db
 
 
 ### Run with docker
-***
+```shell
+git clone https://github.com/xtina999/airport-api-service.git
+cd airport-api-service
+python -m venv venv
+source venv/bin/activate
+pip install -requirenemts.txt
+set DB_HOST=<your db hostname>
+set DB_NAME=<your db name>
+set DB_USER=<your db username>
+set DB_PASSWORD=<your db user password>
+set SECRET_KEY=<your secret key>
+python manage.py migrate
+python manage.py runserver
+```
 Docker should be installed
 
 ```shell
@@ -49,3 +62,4 @@ docker-compose up
 - get access token via /api/user/token
 ***
 ##### DB structure:
+![DB structure](diagr_airport.png "DB structure")
