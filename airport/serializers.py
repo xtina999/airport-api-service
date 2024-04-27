@@ -102,24 +102,22 @@ class TicketSerializer(serializers.ModelSerializer):
         queryset=Order.objects.all(),
         required=False
     )
-    route = serializers.StringRelatedField(
+    route =  serializers.StringRelatedField(
         source="flight.route",
         read_only=True
     )
-    airplane = serializers.StringRelatedField(
-        source="flight.airplane",
-        read_only=True
-    )
-    departure_time = serializers.StringRelatedField(
+    departure_time =  serializers.StringRelatedField(
         source="flight.departure_time",
         read_only=True
     )
-    arrival_time = serializers.StringRelatedField(
+    arrival_time =  serializers.StringRelatedField(
         source="flight.arrival_time",
         read_only=True
     )
-    user = serializers.StringRelatedField(source="order.user", read_only=True)
-
+    airplane =  serializers.StringRelatedField(
+        source="flight.airplane",
+        read_only=True
+    )
     class Meta:
         model = Ticket
         fields = (
@@ -127,13 +125,19 @@ class TicketSerializer(serializers.ModelSerializer):
             "passenger",
             "row",
             "seat",
+            "order",
             "route",
-            "airplane",
             "departure_time",
             "arrival_time",
-            "order",
-            "user"
+            "airplane"
         )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get('request')
+        if request:
+            user = request.user
+            self.fields['order'].queryset = Order.objects.filter(user=user)
 
     def get_user(self, obj):
         return obj.order.user.name if obj.order else None

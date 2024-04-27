@@ -7,18 +7,22 @@ WORKDIR app/
 
 COPY requirements.txt requirements.txt
 
-#RUN pip install -r requirements.txt
-#RUN pip install --progress-bar off -r requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 COPY . .
 
+RUN mkdir -p /files/media
+# Додаємо нового користувача з ім'ям my_user
+RUN adduser  \
+    --disabled-password \
+    --no-create-home  \
+    my_user
 
-#CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
-#RUN adduser \
-#    --disabled-password \
-#    --no-create-home \
-#    my_user
-#
-#
-#USER my_user
+# Змінюємо власника для папки /files/media на нового користувача my_user
+RUN chown -R my_user /files/media
+
+# Змінюємо дозволи доступу до папки /files/media
+RUN chmod -R 755 /files/media
+
+# Встановлюємо користувача за замовчуванням для подальших операцій
+USER my_user

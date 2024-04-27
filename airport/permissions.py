@@ -28,8 +28,13 @@ class IsTicketOrderCreatorOrReadOnly(BasePermission):
         return request.method in permissions.SAFE_METHODS
 
     def has_object_permission(self, request, view, obj):
+        # Дозволити перегляд тільки автору об'єкта
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        # Дозволити створення тільки автору
         if view.action == 'create':
             return True
+        # Перевірка, чи користувач, який робить запит, є автором об'єкта
         return obj.user == request.user
 
 

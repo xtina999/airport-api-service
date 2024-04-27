@@ -249,11 +249,24 @@ class TicketViewSet(viewsets.ModelViewSet):
         return queryset.filter(order__user=self.request.user)
 
     def perform_create(self, serializer) -> None:
-        order = serializer.validated_data["order"]
-        order.user = self.request.user
-        order.save()
+        serializer.save()
 
-        serializer.save(user=self.request.user)
+    def perform_destroy(self, instance):
+        # Видаляємо об'єкт з бази даних
+        instance.delete()
+
+    def destroy(self, request, *args, **kwargs):
+        # Отримуємо об'єкт квитка за його ID
+        instance = self.get_object()
+        # Перевіряємо, чи користувач є автором квитка
+        if instance.order.user == request.user:
+            # Викликаємо метод видалення об'єкта
+            self.perform_destroy(instance)
+            # Повертаємо відповідь про успішне видалення
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        # Якщо користувач не є автором квитка, повертаємо відповідь з помилкою
+        return Response({"message": "You don't have permission to delete this ticket."},
+                        status=status.HTTP_403_FORBIDDEN)
 
     def list(self, request, *args, **kwargs) -> list:
         """Get list of Ticket"""
