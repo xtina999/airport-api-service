@@ -15,6 +15,7 @@ from airport.models import (
     Crew,
     City
 )
+from airport.permissions import IsTicketOrderCreatorOrReadOnly
 
 from airport.serializers import (
     CitySerializer,
@@ -241,6 +242,7 @@ class FlightViewSet(viewsets.ModelViewSet):
 class TicketViewSet(viewsets.ModelViewSet):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
+    permission_classes = [IsTicketOrderCreatorOrReadOnly]
 
     def get_queryset(self) -> QuerySet:
         queryset = self.queryset.select_related("flight", "order")
@@ -261,6 +263,7 @@ class TicketViewSet(viewsets.ModelViewSet):
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+    permission_classes = [IsTicketOrderCreatorOrReadOnly]
 
     def get_queryset(self) -> QuerySet:
         queryset = self.queryset
