@@ -2,7 +2,8 @@ from typing import Type
 
 from django.db.models import Count, F, QuerySet
 from drf_spectacular.utils import extend_schema, OpenApiParameter
-from rest_framework import viewsets, serializers
+from rest_framework import viewsets, serializers, status
+from rest_framework.response import Response
 
 from airport.models import (
     AirplaneType,
@@ -15,6 +16,7 @@ from airport.models import (
     Crew,
     City
 )
+from airport.permissions import IsTicketOrderCreatorOrReadOnly
 
 from airport.serializers import (
     CitySerializer,
@@ -241,17 +243,30 @@ class FlightViewSet(viewsets.ModelViewSet):
 class TicketViewSet(viewsets.ModelViewSet):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
+    permission_classes = [IsTicketOrderCreatorOrReadOnly]
 
     def get_queryset(self) -> QuerySet:
         queryset = self.queryset.select_related("flight", "order")
         return queryset.filter(order__user=self.request.user)
 
-    def perform_create(self, serializer) -> None:
-        order = serializer.validated_data["order"]
-        order.user = self.request.user
-        order.save()
+    def perform_create(self, serializer):
+        data = serializer.validated_data
+        user = self.request.user
+        order = Order.objects.create(user=user)
+        serializer.save(order=order)
 
-        serializer.save(user=self.request.user)
+    def perform_destroy(self, instance):
+        instance.delete()
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.order.user == request.user:
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({
+            "message": "You don't have permission to delete this ticket."
+        },
+            status=status.HTTP_403_FORBIDDEN)
 
     def list(self, request, *args, **kwargs) -> list:
         """Get list of Ticket"""
@@ -261,6 +276,7 @@ class TicketViewSet(viewsets.ModelViewSet):
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+    permission_classes = [IsTicketOrderCreatorOrReadOnly]
 
     def get_queryset(self) -> QuerySet:
         queryset = self.queryset

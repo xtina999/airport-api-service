@@ -5,14 +5,19 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from airport.models import AirplaneType, Airplane, Airport, City
-from airport.serializers import AirplaneListSerializer, AirportListSerializer, AirplaneTypeSerializer, \
+from airport.serializers import (
+    AirplaneListSerializer,
+    AirportListSerializer,
     AirportDetailSerializer
+)
 
 AIRPLANE_URL = reverse("airport:airplane-list")
 AIRPORT_URL = reverse("airport:airport-list")
 
+
 def detail_url(airport_id):
     return reverse("airport:airport-detail", args=(airport_id,))
+
 
 def sample_city(**params):
     defaults = {
@@ -164,4 +169,3 @@ class AdminAirportTests(TestCase):
             payload["closest_big_city"],
             airport.closest_big_city.id
         )
-
