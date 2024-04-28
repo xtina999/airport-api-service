@@ -51,6 +51,7 @@ python manage.py runserver
 Docker should be installed
 
 ```shell
+in Dockerfile add your email your docker account
 docker-compose build
 docker-compose up
 ```
