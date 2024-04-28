@@ -63,3 +63,29 @@ docker-compose up
 ***
 ##### DB structure:
 ![DB structure](diagr_airport.png "DB structure")
+***
+### Demo and instruction manual
+1. User registration page
+![registration page](screen_api/user_register.png "registration page")
+2. Registration is successful
+![registration is successful](screen_api/register_user_created.png "registration is successful")
+3. Login to get token
+![login to get token](screen_api/token_user.png "login to get token")
+4. Get access token
+![access token](screen_api/user_get_access_token.png "access token")
+5. Inserting the token into the site header
+![token into the site header](screen_api/user_headers_Bearer_token.png "token into the site header")
+6. All endpoint Airport service
+![All endpoint Airport service](screen_api/user_get_access_of_page_airport.png "All endpoint Airport service")
+7. Airplanes page
+![Airplanes page](screen_api/airport_airplanes.png "Airplanes page")
+8. Airplane image
+![Airplane image](screen_api/airport_airplane_image.png "Airplane image")
+9. Сreating a ticket
+![Сreating a ticket](screen_api/airport_ticket_created_.png "Сreating a ticket")
+10. Order page
+![Order page](screen_api/airplane_order_create_auto.png "Order page")
+11. Page view Redoc
+![Redoc](screen_api/redoc.png "Redoc")
+12. Page view Swagger
+![swagger](screen_api/swagger.png "swagger")
