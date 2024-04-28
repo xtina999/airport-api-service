@@ -10,3 +10,4 @@ venv/
 **db.sqlite3
 media/
 .flake8
+.venv

@@ -98,23 +98,19 @@ class FlightSerializer(serializers.ModelSerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
-    # order = serializers.PrimaryKeyRelatedField(
-    #     queryset=Order.objects.all(),
-    #     required=False
-    # )
-    route =  serializers.StringRelatedField(
+    route = serializers.StringRelatedField(
         source="flight.route",
         read_only=True
     )
-    departure_time =  serializers.StringRelatedField(
+    departure_time = serializers.StringRelatedField(
         source="flight.departure_time",
         read_only=True
     )
-    arrival_time =  serializers.StringRelatedField(
+    arrival_time = serializers.StringRelatedField(
         source="flight.arrival_time",
         read_only=True
     )
-    airplane =  serializers.StringRelatedField(
+    airplane = serializers.StringRelatedField(
         source="flight.airplane",
         read_only=True
     )
@@ -133,13 +129,6 @@ class TicketSerializer(serializers.ModelSerializer):
             "airplane"
         )
 
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     request = self.context.get('request')
-    #     if request:
-    #         user = request.user
-    #         self.fields['order'].queryset = Order.objects.filter(user=user)
-
     def get_user(self, obj):
         return obj.order.user.name if obj.order else None
 
@@ -157,7 +146,6 @@ class TicketSerializer(serializers.ModelSerializer):
             )
 
         return data
-
 
     def validate_seat(self, value):
         flight = self.context["request"].data.get("flight")
@@ -252,7 +240,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context.get('request')
-        print(f"Current user: {request.user}")  # Виведення поточного користувача для перевірки
+        print(f"Current user: {request.user}")
         with transaction.atomic():
             tickets_data = validated_data.pop("tickets")
             order = Order.objects.create(user=request.user, **validated_data)

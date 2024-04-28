@@ -20,7 +20,7 @@ class IsAdminALLORIsAuthenticatedReadOnly(BasePermission):
 
 class IsTicketOrderCreatorOrReadOnly(BasePermission):
     """
-    Дозволяє доступ для створення тільки автору та дозволяє переглядати усім.
+    Allows only author access to create and view
     """
     def has_permission(self, request, view):
         if view.action == 'create':
@@ -28,13 +28,10 @@ class IsTicketOrderCreatorOrReadOnly(BasePermission):
         return request.method in permissions.SAFE_METHODS
 
     def has_object_permission(self, request, view, obj):
-        # Дозволити перегляд тільки автору об'єкта
         if request.method in permissions.SAFE_METHODS:
             return True
-        # Дозволити створення тільки автору
         if view.action == 'create':
             return True
-        # Перевірка, чи користувач, який робить запит, є автором об'єкта
         return obj.user == request.user
 
 
